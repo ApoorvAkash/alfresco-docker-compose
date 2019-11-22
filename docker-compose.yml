@@ -12,13 +12,13 @@ version: "2"
 
 services:
     process:
-        image: alfresco/process-services:1.6.2
+        image: alfresco/process-services
         environment:
             - ACTIVITI_DATASOURCE_USERNAME=alfresco
             - ACTIVITI_DATASOURCE_PASSWORD=alfresco
             - ACTIVITI_DATASOURCE_DRIVER=org.postgresql.Driver
             - ACTIVITI_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
-            - ACTIVITI_DATASOURCE_URL='jdbc:postgresql://postgres:5432/activiti?characterEncoding=UTF-8'
+            - ACTIVITI_DATASOURCE_URL='jdbc:postgresql://postgres:5433/activiti?characterEncoding=UTF-8'
             - ACTIVITI_CSRF_DISABLED='true'
             - ACTIVITI_CORS_ENABLED='true'
             - ACTIVITI_ES_SERVER_TYPE=client
@@ -30,14 +30,14 @@ services:
         - 9999:8080
         links:
         - elasticsearch:elasticsearch
-        - postgres:postgres
+        - postgres-process:postgres-process
         depends_on:
         - elasticsearch
-        - postgres
+        - postgres-process
 
     elasticsearch:
         image: elasticsearch:1.7.3
-    postgres:
+    postgres-process:
         image: postgres:11.4
         mem_limit: 512m
         environment:
@@ -45,6 +45,8 @@ services:
             - POSTGRES_USER=alfresco
             - POSTGRES_DB=activiti
         command: postgres -c max_connections=300 -c log_min_messages=LOG
+        ports:
+            - 5433:5432
         volumes:
             - postgres-process-data-volume:/var/lib/postgresql/process/data
 
