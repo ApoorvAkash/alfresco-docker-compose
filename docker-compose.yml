@@ -11,6 +11,46 @@
 version: "2"
 
 services:
+    process:
+        image: alfresco/process-services
+        environment:
+            ACTIVITI_DATASOURCE_USERNAME: alfresco
+            ACTIVITI_DATASOURCE_PASSWORD: alfresco
+            ACTIVITI_DATASOURCE_DRIVER: org.postgresql.Driver
+            ACTIVITI_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+            ACTIVITI_DATASOURCE_URL: 'jdbc:postgresql://postgres:5432/activiti?characterEncoding=UTF-8'
+            ACTIVITI_CSRF_DISABLED: 'true'
+            ACTIVITI_CORS_ENABLED: 'true'
+            ACTIVITI_ES_SERVER_TYPE: client
+            ACTIVITI_ES_DISCOVERY_HOSTS: elasticsearch:9300
+            ACTIVITI_ES_CLUSTER_NAME: elasticsearch
+        volumes:
+            #- "~/.activiti/enterprise-license:/root/.activiti/enterprise-license/:ro"
+            - ./activiti-app.properties:/usr/share/tomcat/lib/activiti-app.properties
+            #- ./transform.lic:/usr/share/tomcat/lib/transform.lic
+            - ./psdata:/usr/local/data/
+        ports:
+        - 8081:8080
+        links:
+        - elasticsearch:elasticsearch
+        - postgres:postgres
+        depends_on:
+        - elasticsearch
+        - postgres
+
+    elasticsearch:
+        image: elasticsearch:1.7.3
+    postgres:
+        image: postgres:11.4
+        mem_limit: 512m
+        environment:
+            - POSTGRES_PASSWORD=alfresco
+            - POSTGRES_USER=alfresco
+            - POSTGRES_DB=activiti
+        command: postgres -c max_connections=300 -c log_min_messages=LOG
+        volumes:
+            - postgres-process-data-volume:/var/lib/postgresql/process/data
+
     alfresco:
         image: alfresco/alfresco-content-repository:6.3.0-A1
         mem_limit: 1700m
@@ -169,7 +209,7 @@ services:
         ports:
             - 5432:5432
         volumes:
-            - postgres-data-volume:/var/lib/postgresql/data
+            - postgres-content-data-volume:/var/lib/postgresql/content/data
 
     solr6:
         image: alfresco/alfresco-search-services:1.4.0
@@ -240,11 +280,9 @@ services:
 
 volumes:
     alfresco-repository-data-volume:
-        external: true
-    postgres-data-volume:
-        external: true
+    postgres-process-data-volume:
+    postgres-content-data-volume:
     solr-data-volume:
-        external: true‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍‍
     shared-file-store-volume:
         driver_opts:
             type: tmpfs
