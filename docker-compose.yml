@@ -217,7 +217,7 @@ services:
             - 8080:8080
         links:
             - digital-workspace
-            - alfresco
+            - alfresco-content-services
             - share
 
     sync-service:
@@ -239,6 +239,9 @@ services:
         ports:
             - 9090:9090
     
+    elasticsearch:
+        image: elasticsearch:1.7.3
+
     alfresco-process-services:
         image: alfresco/process-services:1.10.0
         container_name: alfresco-process-services
@@ -256,18 +259,17 @@ services:
             ACTIVITI_ES_CLUSTER_NAME: elasticsearch
         volumes:
             #- "~/.activiti/enterprise-license:/root/.activiti/enterprise-license/:ro"
-            - ./activiti-app.properties:/usr/share/tomcat/lib/activiti-app.properties
+        - ./activiti-app.properties:/usr/share/tomcat/lib/activiti-app.properties
             #- ./transform.lic:/usr/share/tomcat/lib/transform.lic
-            - ./psdata:/usr/local/data/
-            ports:
-            - 9999:9999
-            links:  
-            - elasticsearch:elasticsearch
-            - postgres:postgres
-            depends_on:
-            - elasticsearch
-            - postgres
-
+        - ./psdata:/usr/local/data/
+        ports:
+        - 9999:9999
+        links:  
+        - elasticsearch:elasticsearch
+        - postgres:postgres
+        depends_on:
+        - elasticsearch
+        - postgres
 
 volumes:
     alfresco-repository-data-volume:
