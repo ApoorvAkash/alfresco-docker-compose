@@ -41,13 +41,7 @@ services:
     elasticsearch:
         image: elasticsearch:1.7.3
     postgres:
-        image: postgres:11.4
-        mem_limit: 512m
-        environment:
-            - POSTGRES_PASSWORD=alfresco
-            - POSTGRES_USER=alfresco
-            - POSTGRES_DB=activiti
-        command: postgres -c max_connections=300 -c log_min_messages=LOG
+        image: apoorvakash/multi-db-postgres
         volumes:
             - postgres-process-data-volume:/var/lib/postgresql/process/data
 
@@ -199,10 +193,10 @@ services:
                 "
 
     postgres:
-        image: postgres:11.4
-        mem_limit: 512m
+        image: apoorvakash/multi-db-postgres
+        mem_limit: 1024m
         environment:
-            - POSTGRES_PASSWORD=alfresco
+            - POSTGRES_MULTIPLE_DATABASES=alfresco,activiti
             - POSTGRES_USER=alfresco
             - POSTGRES_DB=alfresco
         command: postgres -c max_connections=300 -c log_min_messages=LOG
