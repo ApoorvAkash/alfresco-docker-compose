@@ -11,9 +11,8 @@
 version: "2"
 
 services:
-    alfresco-content-services:
-        image: alfresco/alfresco-content-repository:6.2.0
-        container_name: alfresco-content-services
+    alfresco:
+        image: alfresco/alfresco-content-repository:6.3.0-A1
         mem_limit: 1700m
         environment:
             JAVA_OPTS: "
@@ -33,27 +32,29 @@ services:
                 -Daos.baseUrlOverwrite=http://localhost:8080/alfresco/aos
                 -Dmessaging.broker.url=\"failover:(nio://activemq:61616)?timeout=3000&jms.useCompression=true\"
                 -Ddeployment.method=DOCKER_COMPOSE
+
                 -Dtransform.service.enabled=true
                 -Dtransform.service.url=http://transform-router:8095
                 -Dsfs.url=http://shared-file-store:8099/
+
                 -Dlocal.transform.service.enabled=true
                 -DlocalTransform.pdfrenderer.url=http://alfresco-pdf-renderer:8090/
                 -DlocalTransform.imagemagick.url=http://imagemagick:8090/
                 -DlocalTransform.libreoffice.url=http://libreoffice:8090/
                 -DlocalTransform.tika.url=http://tika:8090/
                 -DlocalTransform.misc.url=http://transform-misc:8090/
+
                 -Dlegacy.transform.service.enabled=true
                 -Dalfresco-pdf-renderer.url=http://alfresco-pdf-renderer:8090/
                 -Djodconverter.url=http://libreoffice:8090/
                 -Dimg.url=http://imagemagick:8090/
                 -Dtika.url=http://tika:8090/
                 -Dtransform.misc.url=http://transform-misc:8090/
+
                 -Dcsrf.filter.enabled=false
                 -Ddsync.service.uris=http://localhost:9090/alfresco
                 -Xms1500m -Xmx1500m
                 "
-        volumes:
-            - alfresco-repository-data-volume:/usr/local/tomcat/alf_data‍‍‍
 
     transform-router:
         mem_limit: 512m
@@ -169,8 +170,6 @@ services:
         command: postgres -c max_connections=300 -c log_min_messages=LOG
         ports:
             - 5432:5432
-        volumes:
-            - postgres-data-volume:/var/lib/postgresql/data
 
     solr6:
         image: alfresco/alfresco-search-services:1.4.0
@@ -189,8 +188,6 @@ services:
             - "SOLR_JAVA_MEM=-Xms2g -Xmx2g"
         ports:
             - 8083:8983 #Browser port
-        volumes:
-            - solr-data-volume:/opt/alfresco-search-services/data
 
     activemq:
         image: alfresco/alfresco-activemq:5.15.8
@@ -211,13 +208,13 @@ services:
         image: alfresco/alfresco-acs-nginx:3.0.1
         mem_limit: 128m
         depends_on:
-            - alfresco-content-services
+            - alfresco
             - digital-workspace
         ports:
             - 8080:8080
         links:
             - digital-workspace
-            - alfresco-content-services
+            - alfresco
             - share
 
     sync-service:
@@ -238,44 +235,10 @@ services:
 
         ports:
             - 9090:9090
-    
-    elasticsearch:
-        image: elasticsearch:1.7.3
-
-    alfresco-process-services:
-        image: alfresco/process-services:1.10.0
-        container_name: alfresco-process-services
-        environment:
-            JAVA_OPTS: "
-            -Ddb.driver=org.postgresql.Driver
-            -Ddb.username=alfresco
-            -Ddb.password=alfresco
-            -Ddb.url=jdbc:postgresql://postgres:5432/activiti
-            "
-            ACTIVITI_CSRF_DISABLED: 'true'
-            ACTIVITI_CORS_ENABLED: 'true'
-            ACTIVITI_ES_SERVER_TYPE: client
-            ACTIVITI_ES_DISCOVERY_HOSTS: elasticsearch:9300
-            ACTIVITI_ES_CLUSTER_NAME: elasticsearch
-        volumes:
-            #- "~/.activiti/enterprise-license:/root/.activiti/enterprise-license/:ro"
-        - ./activiti-app.properties:/usr/share/tomcat/lib/activiti-app.properties
-            #- ./transform.lic:/usr/share/tomcat/lib/transform.lic
-        - ./psdata:/usr/local/data/
-        ports:
-        - 9999:9999
-        links:  
-        - elasticsearch:elasticsearch
-        - postgres:postgres
-        depends_on:
-        - elasticsearch
-        - postgres
 
 volumes:
-    alfresco-repository-data-volume:
-    postgres-data-volume:
-    solr-data-volume:
     shared-file-store-volume:
         driver_opts:
             type: tmpfs
             device: tmpfs
+
