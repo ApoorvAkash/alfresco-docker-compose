@@ -4,11 +4,12 @@ services:
   process:
     image: alfresco/process-services:1.6.2
     environment:
-      ACTIVITI_DATASOURCE_USERNAME: alfresco
-      ACTIVITI_DATASOURCE_PASSWORD: alfresco
-      ACTIVITI_DATASOURCE_DRIVER: org.postgresql.Driver
-      ACTIVITI_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
-      ACTIVITI_DATASOURCE_URL: 'jdbc:postgresql://postgres:5432/activiti?characterEncoding=UTF-8'
+      JAVA_OPTS: "
+      -Ddb.driver=org.postgresql.Driver
+      -Ddb.username=alfresco
+      -Ddb.password=alfresco
+      -Ddb.url=jdbc:postgresql://postgres:5432/activiti
+      "
       ACTIVITI_CSRF_DISABLED: 'true'
       ACTIVITI_CORS_ENABLED: 'true'
       ACTIVITI_ES_SERVER_TYPE: client
