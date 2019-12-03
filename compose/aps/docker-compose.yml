@@ -16,7 +16,7 @@ services:
       ACTIVITI_ES_CLUSTER_NAME: elasticsearch
     volumes:
         #- ./aps-config/enterprise-license:/root/.activiti/enterprise-license/:ro
-        - ./aps-config/activiti-app.properties:/usr/share/tomcat/lib/activiti-app.properties
+        #- ./aps-config:/usr/share/tomcat/lib/
         #- ./aps-config/transform.lic:/usr/share/tomcat/lib/transform.lic
         - ./aps-data/process:/usr/local/data/
     ports:
