@@ -16,10 +16,11 @@ services:
       ACTIVITI_ES_DISCOVERY_HOSTS: elasticsearch:9300
       ACTIVITI_ES_CLUSTER_NAME: elasticsearch
     volumes:
+      
         #- ./aps-config/enterprise-license:/root/.activiti/enterprise-license/:ro
         #- ./aps-config:/usr/share/tomcat/lib/
         #- ./aps-config/transform.lic:/usr/share/tomcat/lib/transform.lic
-        - ./aps-data/process:/usr/local/data/
+        - aps-repo-data:/usr/local/data/
     ports:
     - 9999:8080
     links:
@@ -38,4 +39,8 @@ services:
       POSTGRES_USER: alfresco
       POSTGRES_PASSWORD: alfresco
     volumes:
-        - ./aps-data/postgres:/var/lib/postgresql/data
+        - aps-postgres-data:/var/lib/postgresql/data
+
+volumes: 
+  aps-repo-data:
+  aps-postgres-data:
