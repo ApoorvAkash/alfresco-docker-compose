@@ -8,18 +8,16 @@ post '/payload' do
     package = payload['package']
     if package['package_type'] == 'maven'
       package_files = package['package_version']['package_files']
-      package_files.each { |asset| downloadUrl =  asset['download_url']
-      if tempFile.original_filename.end_with? "jar"
+      package_files.each { |asset|
+      if asset['name'].end_with? "jar"
         begin
-          tempFile = Down.download(downloadUrl);
-            originalFilename = tempFile.original_filename
-            puts originalFilename;
+            tempFile = Down.download(asset['download_url']);
             deleteFile = tempFile.original_filename[0..5].concat('*');
             system("pwd")
             system("find ./api-server/target/maven/ -type f -name #{deleteFile} -delete");
             system("sudo docker container stop aps");
             system("sudo docker exec aps find /usr/share/tomcat/webapps/activiti-app/WEB-INF/lib -type f -name #{deleteFile} -delete");
-            FileUtils.mv(tempFile.path, "./api-server/target/maven/#{originalFilename}");
+            FileUtils.mv(tempFile.path, "./api-server/target/maven/#{tempFile.original_filename}");
             system("sudo docker cp /home/ubuntu/alfresco-docker-compose/api-server/target/maven/#{tempFile.original_filename} aps:/usr/share/tomcat/webapps/activiti-app/WEB-INF/lib");
             system("sudo docker container start aps");
         rescue => exception
