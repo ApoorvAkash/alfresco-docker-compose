@@ -12,12 +12,12 @@ post '/payload' do
         begin
           tempFile = Down.download(downloadUrl)
           deleteFile = tempFile.original_filename[0..5].concat('*');
-          system(find ./target/maven/ -type f -name "#{deleteFile}" -delete)
-          system(sudo docker container stop aps) 
-          system(sudo docker exec aps find /usr/local/tomcat/webapps/activiti-app/WEB-INF/lib -type f -name "#{deleteFile}" -delete)
-          FileUtils.mv(tempFile.path, "./target/maven/#{tempFile.original_filename}")
-          system(sudo docker cp "/home/ubuntu/alfresco-docker-compose/api-server/target/maven/#{tempFile.original_filename}" aps:/usr/share/tomcat/webapps/activiti-app/WEB-INF/lib)
-          system(sudo docker container start aps)
+          system("find ./target/maven/ -type f -name #{deleteFile} -delete");
+          system("sudo docker container stop aps");
+          system("sudo docker exec aps find /usr/share/tomcat/webapps/activiti-app/WEB-INF/lib -type f -name #{deleteFile} -delete");
+          FileUtils.mv(tempFile.path, "./target/maven/#{tempFile.original_filename}");
+          system("sudo docker cp /home/ubuntu/alfresco-docker-compose/api-server/target/maven/#{tempFile.original_filename} aps:/usr/share/tomcat/webapps/activiti-app/WEB-INF/lib");
+          system("sudo docker container start aps");
         rescue => exception
           puts "Exception Message: #{ exception.message }"
           puts "Exception Backtrace: #{ exception.backtrace }"
@@ -25,4 +25,7 @@ post '/payload' do
       }
     if package['package_type'] == 'npm'
       puts 'Write Code here for npm packaging'
+    end
+  end
+end
 end
