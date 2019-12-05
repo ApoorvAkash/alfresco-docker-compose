@@ -15,10 +15,10 @@ post '/payload' do
             deleteFile = tempFile.original_filename[0..5].concat('*');
             system("pwd")
             system("find ./api-server/target/maven/ -type f -name #{deleteFile} -delete");
-            system("sudo docker container stop aps");
             system("sudo docker exec aps find /usr/share/tomcat/webapps/activiti-app/WEB-INF/lib -type f -name #{deleteFile} -delete");
             FileUtils.mv(tempFile.path, "./api-server/target/maven/#{tempFile.original_filename}");
             system("sudo docker cp /home/ubuntu/alfresco-docker-compose/api-server/target/maven/#{tempFile.original_filename} aps:/usr/share/tomcat/webapps/activiti-app/WEB-INF/lib");
+            system("sudo docker container stop aps");
             system("sudo docker container start aps");
         rescue => exception
           puts "Exception Message: #{ exception.message }"
