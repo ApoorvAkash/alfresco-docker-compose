@@ -13,6 +13,7 @@ version: "2"
 services:
     alfresco:
         image: alfresco/alfresco-content-repository:6.3.0-A1
+        container_name: acs
         mem_limit: 1700m
         environment:
             JAVA_OPTS: "
